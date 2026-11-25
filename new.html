@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Event Hub</title>
+
+  <style>
+    /* ===================================================
+       CAMPUS EVENT HUB - neon blue + beige theme
+       =================================================== */
+
+    /* ----- colours (change them here) ----- */
+    :root {
+      --navy: #0b1b3a;
+      --neon: #00cfff;
+      --beige: #f6edda;
+      --beige-dark: #e6d8b8;
+      --card: #fffaf0;
+      --green: #14915f;
+      --orange: #e07b00;
+      --red: #d6455d;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: var(--beige);
+      color: var(--navy);
+    }
+
+    /* ----- header + menu (stays on top while scrolling) ----- */
+    header {
+      background: var(--navy);
+      padding: 12px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      border-bottom: 3px solid var(--neon);
+      box-shadow: 0 0 15px rgba(0, 207, 255, 0.6);
+    }
+
+    header h1 {
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      color: var(--neon);
+      text-shadow: 0 0 8px var(--neon);
+    }
+
+    nav { display: flex; flex-wrap: wrap; align-items: center; }
+
+    .nav-title {
+      color: var(--neon);
+      font-size: 12px;
+      font-weight: bold;
+      margin: 0 4px 0 10px;
+    }
+
+    nav a {
+      display: inline-block;
+      color: white;
+      text-decoration: none;
+      padding: 7px 13px;
+      margin: 3px;
+      border-radius: 20px;
+      border: 1px solid var(--neon);
+      font-size: 14px;
+      transition: 0.3s;
+    }
+
+    nav a:hover { background: var(--neon); color: var(--navy); box-shadow: 0 0 12px var(--neon); }
+
+    /* the menu button of the page you are on is lit up */
+    body:not(:has(:target)) nav a[href="#events"],
+    body:has(#events:target, #events :target) nav a[href="#events"],
+    body:has(#register:target) nav a[href="#register"],
+    body:has(#slip:target) nav a[href="#slip"],
+    body:has(#dashboard:target) nav a[href="#dashboard"],
+    body:has(#guests:target, #guests :target) nav a[href="#guests"],
+    body:has(#vendors:target, #vendors :target) nav a[href="#vendors"],
+    body:has(#budget:target, #budget :target) nav a[href="#budget"],
+    body:has(#timeline:target, #timeline :target) nav a[href="#timeline"],
+    body:has(#seating:target, #seating :target) nav a[href="#seating"] {
+      background: var(--neon);
+      color: var(--navy);
+      box-shadow: 0 0 12px var(--neon);
+    }
+
+    main { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
+    footer { text-align: center; padding: 15px; color: #6b6249; font-size: 13px; }
+    .note { font-size: 13px; color: #5c5640; }
+
+    /* ----- PAGES: only one page is visible at a time ----- */
+    .page { display: none; scroll-margin-top: 140px; }
+    .page:target { display: block; }
+    .page:has(:target) { display: block; }
+    body:not(:has(:target)) #events { display: block; }   /* first page by default */
+
+    /* ----- cards ----- */
+    .card {
+      background: var(--card);
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      border: 2px solid var(--beige-dark);
+      transition: 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--neon);
+      box-shadow: 0 0 14px rgba(0, 207, 255, 0.55);
+    }
+
+    /* ----- buttons ----- */
+    .btn, button {
+      display: inline-block;
+      background: var(--neon);
+      color: var(--navy);
+      font-weight: bold;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(0, 207, 255, 0.7);
+      transition: 0.3s;
+    }
+    .btn:hover, button:hover { background: var(--navy); color: var(--neon); transform: scale(1.05); }
+    .btn.disabled { background: #aaa; color: #555; box-shadow: none; cursor: not-allowed; }
+    .btn.disabled:hover { background: #aaa; color: #555; transform: none; }
+
+    /* ----- how it works strip ----- */
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 15px; }
+    .step { background: var(--navy); color: white; padding: 12px; border-radius: 10px; font-size: 14px; }
+    .step b {
+      display: inline-block; background: var(--neon); color: var(--navy);
+      width: 26px; height: 26px; line-height: 26px; text-align: center;
+      border-radius: 50%; margin-right: 6px;
+    }
+
+    /* ----- FILTER BUTTONS (hidden radio + label) ----- */
+    .filterbox > input { display: none; }
+
+    .filterbox > label {
+      display: inline-block;
+      background: var(--card);
+      color: var(--navy);
+      border: 2px solid var(--neon);
+      padding: 7px 16px;
+      margin: 0 6px 12px 0;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: normal;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .filterbox > label:hover { box-shadow: 0 0 10px var(--neon); }
+
+    /* chosen button is highlighted */
+    .filterbox > input:checked + label {
+      background: var(--neon);
+      box-shadow: 0 0 10px var(--neon);
+      font-weight: bold;
+    }
+
+    /* events page: hide cards that do not match */
+    #ev-fest:checked ~ .events .card:not(.fest),
+    #ev-workshop:checked ~ .events .card:not(.workshop),
+    #ev-seminar:checked ~ .events .card:not(.seminar),
+    #ev-competition:checked ~ .events .card:not(.competition) { display: none; }
+
+    /* guests page: hide rows that do not match */
+    #g-yes:checked ~ .table-wrap tbody tr:not(.yes),
+    #g-no:checked ~ .table-wrap tbody tr:not(.no),
+    #g-pending:checked ~ .table-wrap tbody tr:not(.pending) { display: none; }
+
+    /* vendors page: hide rows that do not match */
+    #v-confirmed:checked ~ .table-wrap tbody tr:not(.confirmed),
+    #v-contacted:checked ~ .table-wrap tbody tr:not(.contacted),
+    #v-notcontacted:checked ~ .table-wrap tbody tr:not(.notcontacted) { display: none; }
+
+    /* ----- event cards ----- */
+    .events { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .events .card { margin-bottom: 0; }
+    .events h3 { margin: 0 0 6px 0; }
+    .events p { margin: 5px 0; font-size: 14px; }
+
+    /* click to open boxes */
+    details { margin: 8px 0; }
+    summary { cursor: pointer; color: #006c94; font-weight: bold; font-size: 14px; }
+    summary:hover { text-decoration: underline; }
+    details p { background: #e6fbff; padding: 6px 8px; border-radius: 6px; font-size: 14px; }
+    details.card summary { font-size: 16px; }
+
+    /* ----- seat / progress bars (they grow when the page opens) ----- */
+    .progress { background: var(--beige-dark); border-radius: 10px; height: 14px; overflow: hidden; margin: 6px 0; }
+    .bar { background: linear-gradient(90deg, #00a8e0, var(--neon)); height: 100%; animation: grow 1.2s ease; }
+    .bar.warn { background: var(--orange); }
+    .bar.full { background: var(--red); }
+    @keyframes grow { from { width: 0; } }
+
+    /* ----- badges ----- */
+    .badge { padding: 3px 9px; border-radius: 10px; font-size: 12px; color: white; white-space: nowrap; }
+    .badge.green  { background: var(--green); }
+    .badge.red    { background: var(--red); }
+    .badge.grey   { background: #777; }
+    .badge.orange { background: var(--orange); animation: pulse 1.5s infinite; }
+    .badge.blue   { background: var(--neon); color: var(--navy); font-weight: bold; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+    /* ----- forms ----- */
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 12px; }
+
+    label { display: flex; flex-direction: column; font-size: 14px; font-weight: bold; }
+
+    input, select, textarea {
+      padding: 9px;
+      margin-top: 4px;
+      border: 2px solid var(--beige-dark);
+      border-radius: 8px;
+      background: white;
+      color: var(--navy);
+      font-size: 14px;
+      font-weight: normal;
+      font-family: Arial, sans-serif;
+      transition: 0.3s;
+    }
+
+    /* glowing border when you click in a box */
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--neon);
+      box-shadow: 0 0 8px var(--neon);
+    }
+
+    /* red = wrong, green = correct */
+    input:user-invalid, select:user-invalid, textarea:user-invalid { border-color: var(--red); background: #fff1f3; }
+    input:user-valid, textarea:user-valid { border-color: var(--green); }
+
+    /* small help text, visible only while typing in that box */
+    .hint { display: none; font-size: 12px; font-weight: normal; color: #006c94; margin-top: 3px; }
+    input:focus ~ .hint, textarea:focus ~ .hint { display: block; }
+
+    .agree { flex-direction: row; align-items: center; font-weight: normal; margin-bottom: 12px; }
+    .agree input { margin: 0 8px 0 0; }
+
+    /* ----- event choice cards (register page) ----- */
+    .choice { position: relative; margin-bottom: 15px; }
+    .choice input { position: absolute; opacity: 0; }
+    .choice label {
+      display: block; font-weight: normal; background: white;
+      border: 2px solid var(--beige-dark); border-radius: 10px;
+      padding: 10px 12px; margin-bottom: 8px; cursor: pointer; transition: 0.3s;
+    }
+    .choice label:hover { border-color: var(--neon); box-shadow: 0 0 8px var(--neon); }
+    .choice input:checked + label { border-color: var(--neon); background: #e6fbff; box-shadow: 0 0 12px var(--neon); }
+    .choice input:checked + label::after { content: "  ✔ Selected"; color: #006c94; font-weight: bold; }
+    .choice input:disabled + label { opacity: 0.5; cursor: not-allowed; box-shadow: none; border-color: var(--beige-dark); }
+    .choice label span { display: block; font-size: 13px; color: #5c5640; margin-top: 3px; }
+
+    /* ----- success message (shown after a form is sent) ----- */
+    .success-msg {
+      display: none;
+      background: var(--navy);
+      color: var(--neon);
+      border: 2px solid var(--neon);
+      box-shadow: 0 0 12px var(--neon);
+      padding: 12px 18px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      font-weight: bold;
+      scroll-margin-top: 140px;
+    }
+    .success-msg:target { display: block; }
+
+    /* ----- dashboard ----- */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .stat {
+      background: var(--card); padding: 15px; text-align: center; border-radius: 12px;
+      border: 2px solid var(--beige-dark); border-top: 4px solid var(--neon); transition: 0.3s;
+    }
+    .stat:hover { transform: translateY(-4px); box-shadow: 0 0 14px rgba(0, 207, 255, 0.55); }
+    .stat .number { font-size: 24px; font-weight: bold; color: #006c94; }
+    .summary-text { font-weight: bold; color: #006c94; }
+
+    /* ----- tables ----- */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 9px; border-bottom: 1px solid var(--beige-dark); text-align: left; font-size: 14px; }
+    th { background: var(--navy); color: var(--neon); }
+    tbody tr:hover { background: #e6fbff; }
+
+    .notif-list { list-style: none; padding: 0; margin: 0; }
+    .notif-list li { padding: 10px; margin-bottom: 8px; background: white; border-left: 5px solid var(--neon); border-radius: 6px; font-size: 14px; }
+
+    /* ----- timeline tick boxes ----- */
+    label.task { flex-direction: row; align-items: center; font-weight: normal; }
+    label.task input { margin: 0 8px 0 0; }
+    label.task input:checked + span { text-decoration: line-through; color: #888; }
+
+    /* ----- seating ----- */
+    .tables-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 15px; }
+    .table-card { border: 2px solid var(--neon); border-radius: 10px; padding: 10px; background: white; transition: 0.3s; }
+    .table-card:hover { box-shadow: 0 0 12px var(--neon); }
+    .table-card h4 { margin: 0 0 4px 0; }
+    .table-card ul { padding-left: 18px; margin: 8px 0 0 0; font-size: 14px; }
+
+    .messages { padding-left: 18px; font-size: 14px; }
+    .messages li { margin-bottom: 6px; }
+
+    /* ----- confirmation slip ----- */
+    .slip {
+      max-width: 500px; margin: 0 auto 20px auto; background: white; padding: 20px;
+      border: 3px dashed var(--neon); border-radius: 12px; box-shadow: 0 0 14px rgba(0, 207, 255, 0.5);
+    }
+    .slip h2 { text-align: center; margin-top: 0; }
+    .slip td:first-child { font-weight: bold; width: 40%; }
+    .slip .confirmed { text-align: center; color: var(--green); font-size: 22px; font-weight: bold; margin-top: 15px; }
+    .slip-buttons { text-align: center; }
+
+    /* ----- printing: only the visible page (the slip) is printed ----- */
+    @media print {
+      header, footer, .no-print { display: none; }
+      body { background: white; }
+      .slip { box-shadow: none; }
+    }
+
+    /* ----- mobile ----- */
+    @media (max-width: 600px) {
+      header { position: static; }
+      header h1 { font-size: 20px; }
+      nav a { font-size: 12px; padding: 6px 10px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===================== HEADER + MENU ===================== -->
+  <header>
+    <h1>🎓 Campus Event Hub</h1>
+    <nav>
+      <span class="nav-title">STUDENTS</span>
+      <a href="#events">Events</a>
+      <a href="#register">Register</a>
+      <a href="#slip">My Slip</a>
+
+      <span class="nav-title">ORGANIZERS</span>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#guests">Guests</a>
+      <a href="#vendors">Vendors</a>
+      <a href="#budget">Budget</a>
+      <a href="#timeline">Timeline</a>
+      <a href="#seating">Seating</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- =====================================================
+         PAGE 1: EVENTS  (students browse events and seats)
+         ===================================================== -->
+    <section id="events" class="page">
+      <div id="event-ok" class="success-msg">✔ Event created successfully!</div>
+
+      <h2>Upcoming Events</h2>
+
+      <div class="steps">
+        <div class="step"><b>1</b> Pick an event</div>
+        <div class="step"><b>2</b> Fill the form</div>
+        <div class="step"><b>3</b> Get your slip</div>
+      </div>
+
+      <p class="note">Seat bar colours: 🔵 plenty of seats &nbsp; 🟠 almost full &nbsp; 🔴 full (registration closed)</p>
+
+      <div class="filterbox">
+        <input type="radio" name="evfilter" id="ev-all" checked>
+        <label for="ev-all">All</label>
+        <input type="radio" name="evfilter" id="ev-fest">
+        <label for="ev-fest">Fests</label>
+        <input type="radio" name="evfilter" id="ev-workshop">
+        <label for="ev-workshop">Workshops</label>
+        <input type="radio" name="evfilter" id="ev-seminar">
+        <label for="ev-seminar">Seminars</label>
+        <input type="radio" name="evfilter" id="ev-competition">
+        <label for="ev-competition">Competitions</label>
+
+        <div class="events">
+
+          <div class="card fest">
+            <h3>Tech Fest 2026</h3>
+            <span class="badge blue">Fest</span>
+            <p>📅 5 Dec 2026, 10:00 AM</p>
+            <p>📍 Main Auditorium</p>
+            <p><b>Seats left: 50</b> (150 / 200 registered)</p>
+            <div class="progress"><div class="bar" style="width: 75%;"></div></div>
+            <details>
+              <summary>More info</summary>
+              <p>A full-day fest with tech talks, project displays and fun games.</p>
+              <p>✅ Eligibility: All students</p>
+            </details>
+            <a class="btn" href="#register">Register</a>
+          </div>
+
+          <div class="card workshop">
+            <h3>Web Development Workshop</h3>
+            <span class="badge blue">Workshop</span>
+            <p>📅 12 Dec 2026, 2:00 PM</p>
+            <p>📍 Computer Lab 2</p>
+            <p><b>Seats left: 0</b> (40 / 40 registered)</p>
+            <div class="progress"><div class="bar full" style="width: 100%;"></div></div>
+            <details>
+              <summary>More info</summary>
+              <p>Hands-on workshop to build your first website with HTML and CSS.</p>
+              <p>✅ Eligibility: CSE / IT, 1st and 2nd year</p>
+            </details>
+            <span class="btn disabled">Event Full</span>
+          </div>
+
+          <div class="card seminar">
+            <h3>AI Seminar</h3>
+            <span class="badge blue">Seminar</span>
+            <p>📅 18 Dec 2026, 11:00 AM</p>
+            <p>📍 Seminar Hall</p>
+            <p><b>Seats left: 38</b> (62 / 100 registered)</p>
+            <div class="progress"><div class="bar" style="width: 62%;"></div></div>
+            <details>
+              <summary>More info</summary>
+              <p>An introduction to Artificial Intelligence by an industry guest.</p>
+              <p>✅ Eligibility: All students</p>
+            </details>
+            <a class="btn" href="#register">Register</a>
+          </div>
+
+          <div class="card competition">
+            <h3>Coding Contest</h3>
+            <span class="badge blue">Competition</span>
+            <p>📅 20 Dec 2026, 9:30 AM</p>
+            <p>📍 Computer Lab 1</p>
+            <p><b>Seats left: 5</b> <span class="badge orange">Almost full</span></p>
+            <div class="progress"><div class="bar warn" style="width: 92%;"></div></div>
+            <details>
+              <summary>More info</summary>
+              <p>Solve coding problems against the clock and win prizes.</p>
+              <p>✅ Eligibility: All years</p>
+            </details>
+            <a class="btn" href="#register">Register</a>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- organizer: create event (click to open) -->
+      <details class="card">
+        <summary>➕ Organizer: create a new event</summary>
+        <form method="get" action="#event-ok">
+          <div class="form-grid" style="margin-top: 12px;">
+            <label>Event Title *
+              <input type="text" name="title" required minlength="3" maxlength="60" placeholder="e.g. Robotics Workshop">
+              <span class="hint">At least 3 letters.</span>
+            </label>
+            <label>Category *
+              <select name="category" required>
+                <option>Fest</option>
+                <option>Workshop</option>
+                <option>Seminar</option>
+                <option>Competition</option>
+              </select>
+            </label>
+            <label>Date *
+              <input type="date" name="date" required>
+            </label>
+            <label>Time *
+              <input type="time" name="time" required>
+            </label>
+            <label>Venue *
+              <input type="text" name="venue" required maxlength="40" placeholder="e.g. Seminar Hall">
+            </label>
+            <label>Eligibility *
+              <select name="eligibility" required>
+                <option>All students</option>
+                <option>1st year only</option>
+                <option>CSE / IT only</option>
+                <option>Final year only</option>
+              </select>
+            </label>
+            <label>Seat Limit (1 - 500) *
+              <input type="number" name="limit" required min="1" max="500" placeholder="e.g. 100">
+              <span class="hint">No more students than this can register.</span>
+            </label>
+            <label>Description *
+              <textarea name="description" rows="2" required minlength="10" maxlength="150" placeholder="Short description of the event"></textarea>
+              <span class="hint">10 to 150 characters.</span>
+            </label>
+          </div>
+          <button type="submit">Create Event</button>
+        </form>
+      </details>
+
+      <!-- help -->
+      <div class="card">
+        <h3>Need help?</h3>
+        <details>
+          <summary>How do I register?</summary>
+          <p>Click Register on an event, choose it, fill in your details and submit the form.</p>
+        </details>
+        <details>
+          <summary>What if an event is full?</summary>
+          <p>Full events cannot be selected. Please choose another event.</p>
+        </details>
+        <details>
+          <summary>How do I get my slip?</summary>
+          <p>After registering you will see your slip. Press Ctrl + P to print it or save it as a PDF.</p>
+        </details>
+      </div>
+    </section>
+
+
+    <!-- =====================================================
+         PAGE 2: REGISTER  (student registration form)
+         ===================================================== -->
+    <section id="register" class="page">
+      <h2>Student Registration</h2>
+
+      <!-- after a valid submit, the Slip page opens -->
+      <form class="card" method="get" action="#slip">
+
+        <h3>Step 1: Choose an event</h3>
+        <div class="choice">
+          <input type="radio" name="event" id="e1" value="Tech Fest 2026" required>
+          <label for="e1"><b>Tech Fest 2026</b><span>5 Dec 2026 - 50 seats left</span></label>
+
+          <input type="radio" name="event" id="e2" value="Web Development Workshop" disabled>
+          <label for="e2"><b>Web Development Workshop</b><span>12 Dec 2026 - FULL (cannot select)</span></label>
+
+          <input type="radio" name="event" id="e3" value="AI Seminar">
+          <label for="e3"><b>AI Seminar</b><span>18 Dec 2026 - 38 seats left</span></label>
+
+          <input type="radio" name="event" id="e4" value="Coding Contest">
+          <label for="e4"><b>Coding Contest</b><span>20 Dec 2026 - only 5 seats left!</span></label>
+        </div>
+
+        <h3>Step 2: Your details</h3>
+        <div class="form-grid">
+          <label>Full Name *
+            <input type="text" name="name" required minlength="3" maxlength="40" placeholder="e.g. Ravi Kumar">
+            <span class="hint">Enter at least 3 letters.</span>
+          </label>
+          <label>Roll Number *
+            <input type="text" name="roll" required minlength="5" maxlength="12" placeholder="e.g. 25CS101">
+            <span class="hint">Use the roll number on your ID card.</span>
+          </label>
+          <label>Email *
+            <input type="email" name="email" required placeholder="e.g. ravi@college.edu">
+            <span class="hint">Your confirmation will be sent here.</span>
+          </label>
+          <label>Phone *
+            <input type="text" name="phone" required pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" placeholder="9876543210">
+            <span class="hint">Exactly 10 digits, numbers only.</span>
+          </label>
+          <label>Year *
+            <select name="year" required>
+              <option value="">-- Select --</option>
+              <option>1st Year</option>
+              <option>2nd Year</option>
+              <option>3rd Year</option>
+              <option>4th Year</option>
+            </select>
+          </label>
+          <label>Branch *
+            <select name="branch" required>
+              <option value="">-- Select --</option>
+              <option>CSE</option>
+              <option>IT</option>
+              <option>ECE</option>
+              <option>Mechanical</option>
+              <option>Civil</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="agree">
+          <input type="checkbox" name="agree" required>
+          I meet the eligibility rules of this event.
+        </label>
+
+        <button type="submit">Register Now</button>
+      </form>
+    </section>
+
+
+    <!-- =====================================================
+         PAGE 3: MY SLIP  (confirmation slip, printable)
+         ===================================================== -->
+    <section id="slip" class="page">
+      <div class="success-msg no-print" style="display: block;">
+        ✔ Registration successful! A confirmation email has been sent to ravi@college.edu.
+      </div>
+
+      <p class="note no-print">To print or download this slip, press Ctrl + P and choose "Save as PDF" or a printer. (Sample slip shown.)</p>
+
+      <div class="slip">
+        <h2>Registration Confirmation Slip</h2>
+        <table>
+          <tr><td>Registration ID</td><td>CEM-2026-0151</td></tr>
+          <tr><td>Student Name</td><td>Ravi Kumar</td></tr>
+          <tr><td>Roll Number</td><td>25CS101</td></tr>
+          <tr><td>Event</td><td>Tech Fest 2026</td></tr>
+          <tr><td>Date &amp; Time</td><td>5 Dec 2026, 10:00 AM</td></tr>
+          <tr><td>Venue</td><td>Main Auditorium</td></tr>
+          <tr><td>Seat Number</td><td>151</td></tr>
+        </table>
+        <p class="confirmed">✔ CONFIRMED</p>
+        <p class="note">Please carry this slip and your college ID card to the event.</p>
+      </div>
+
+      <p class="slip-buttons no-print">
+        <a class="btn" href="#register">Register for another event</a>
+        <a class="btn" href="#events">Back to events</a>
+      </p>
+    </section>
+
+
+    <!-- =====================================================
+         PAGE 4: DASHBOARD  (organizer summary)
+         ===================================================== -->
+    <section id="dashboard" class="page">
+      <h2>Organizer Dashboard</h2>
+      <p class="note">A quick summary of everything. (Sample data is shown.)</p>
+
+      <div class="stats">
+        <div class="stat"><div class="number">4</div>Total Events</div>
+        <div class="stat"><div class="number">400</div>Total Seats</div>
+        <div class="stat"><div class="number">307</div>Registered</div>
+        <div class="stat"><div class="number">93</div>Seats Left</div>
+        <div class="stat"><div class="number">2 / 4</div>Guests Said Yes</div>
+        <div class="stat"><div class="number">2 / 4</div>Vendors Confirmed</div>
+        <div class="stat"><div class="number">₹73,500</div>Budget Spent</div>
+        <div class="stat"><div class="number">3 / 6</div>Tasks Done</div>
+      </div>
+
+      <div class="card">
+        <h3>Overall Progress</h3>
+        <p>Seats filled: 77%</p>
+        <div class="progress"><div class="bar" style="width: 77%;"></div></div>
+        <p>Budget used: 65%</p>
+        <div class="progress"><div class="bar" style="width: 65%;"></div></div>
+        <p>Tasks completed: 50%</p>
+        <div class="progress"><div class="bar" style="width: 50%;"></div></div>
+      </div>
+
+      <div class="card">
+        <h3>Seat Status</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Event</th><th>Registered / Limit</th><th>Filled</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Tech Fest 2026</td><td>150 / 200</td>
+                <td><div class="progress"><div class="bar" style="width: 75%;"></div></div></td>
+                <td><span class="badge green">Open</span></td>
+              </tr>
+              <tr>
+                <td>Web Development Workshop</td><td>40 / 40</td>
+                <td><div class="progress"><div class="bar full" style="width: 100%;"></div></div></td>
+                <td><span class="badge red">Full</span></td>
+              </tr>
+              <tr>
+                <td>AI Seminar</td><td>62 / 100</td>
+                <td><div class="progress"><div class="bar" style="width: 62%;"></div></div></td>
+                <td><span class="badge green">Open</span></td>
+              </tr>
+              <tr>
+                <td>Coding Contest</td><td>55 / 60</td>
+                <td><div class="progress"><div class="bar warn" style="width: 92%;"></div></div></td>
+                <td><span class="badge orange">Almost Full</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Recent Registrations</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Reg. ID</th><th>Student</th><th>Roll No.</th><th>Event</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>CEM-2026-0151</td><td>Ravi Kumar</td><td>25CS101</td><td>Tech Fest 2026</td></tr>
+              <tr><td>CEM-2026-0152</td><td>Anita Sharma</td><td>25IT045</td><td>AI Seminar</td></tr>
+              <tr><td>CEM-2026-0153</td><td>Karan Mehta</td><td>25EC012</td><td>Coding Contest</td></tr>
+              <tr><td>CEM-2026-0154</td><td>Sneha Reddy</td><td>25CS077</td><td>Tech Fest 2026</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🔔 Notifications</h3>
+        <ul class="notif-list">
+          <li>📧 Confirmation email sent to ravi@college.edu for Tech Fest 2026.</li>
+          <li>⚠️ Coding Contest has only 5 seats left.</li>
+          <li>🚫 Web Development Workshop is full. Registration is closed.</li>
+          <li>⏰ Reminder: AI Seminar is on 18 Dec 2026 at 11:00 AM.</li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- =====================================================
+         PAGE 5: GUESTS & RSVP  (invited guests)
+         ===================================================== -->
+    <section id="guests" class="page">
+      <div id="guest-ok" class="success-msg">✔ Guest saved successfully!</div>
+
+      <h2>Invited Guests &amp; RSVP</h2>
+
+      <form class="card" method="get" action="#guest-ok">
+        <h3>Add Invited Guest</h3>
+        <div class="form-grid">
+          <label>Event *
+            <select name="event" required>
+              <option value="">-- Select event --</option>
+              <option>Tech Fest 2026</option>
+              <option>Web Development Workshop</option>
+              <option>AI Seminar</option>
+              <option>Coding Contest</option>
+            </select>
+          </label>
+          <label>Guest Name *
+            <input type="text" name="guest" required minlength="3" maxlength="40" placeholder="e.g. Dr. Meena Rao">
+            <span class="hint">At least 3 letters.</span>
+          </label>
+          <label>Role *
+            <select name="role" required>
+              <option>Chief Guest</option>
+              <option>Speaker</option>
+              <option>Judge</option>
+              <option>Guest</option>
+            </select>
+          </label>
+          <label>Email *
+            <input type="email" name="email" required placeholder="e.g. meena@example.com">
+            <span class="hint">RSVP link is sent here.</span>
+          </label>
+          <label>RSVP Status *
+            <select name="rsvp" required>
+              <option>Pending</option>
+              <option>Yes</option>
+              <option>No</option>
+            </select>
+          </label>
+        </div>
+        <button type="submit">Add Guest</button>
+      </form>
+
+      <div class="card">
+        <h3>Guest List (Yes: 2 | No: 1 | Pending: 1)</h3>
+        <div class="filterbox">
+          <input type="radio" name="gfilter" id="g-all" checked>
+          <label for="g-all">All</label>
+          <input type="radio" name="gfilter" id="g-yes">
+          <label for="g-yes">Yes</label>
+          <input type="radio" name="gfilter" id="g-no">
+          <label for="g-no">No</label>
+          <input type="radio" name="gfilter" id="g-pending">
+          <label for="g-pending">Pending</label>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Name</th><th>Role</th><th>Event</th><th>RSVP</th></tr>
+              </thead>
+              <tbody>
+                <tr class="yes"><td>Dr. Meena Rao</td><td>Chief Guest</td><td>Tech Fest 2026</td><td><span class="badge green">Yes</span></td></tr>
+                <tr class="yes"><td>Mr. Arun Verma</td><td>Speaker</td><td>AI Seminar</td><td><span class="badge green">Yes</span></td></tr>
+                <tr class="pending"><td>Ms. Kavya Iyer</td><td>Judge</td><td>Coding Contest</td><td><span class="badge grey">Pending</span></td></tr>
+                <tr class="no"><td>Prof. R. Sharma</td><td>Guest</td><td>Tech Fest 2026</td><td><span class="badge red">No</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =====================================================
+         PAGE 6: VENDORS  (vendors + communication)
+         ===================================================== -->
+    <section id="vendors" class="page">
+      <div id="vendor-ok" class="success-msg">✔ Vendor saved successfully!</div>
+      <div id="msg-ok" class="success-msg">✔ Message sent to the vendor!</div>
+
+      <h2>Vendors</h2>
+
+      <form class="card" method="get" action="#vendor-ok">
+        <h3>Add Vendor</h3>
+        <div class="form-grid">
+          <label>Event *
+            <select name="event" required>
+              <option value="">-- Select event --</option>
+              <option>Tech Fest 2026</option>
+              <option>Web Development Workshop</option>
+              <option>AI Seminar</option>
+              <option>Coding Contest</option>
+            </select>
+          </label>
+          <label>Vendor Name *
+            <input type="text" name="vendor" required minlength="2" maxlength="40" placeholder="e.g. Royal Caterers">
+            <span class="hint">At least 2 letters.</span>
+          </label>
+          <label>Category *
+            <select name="category" required>
+              <option>Catering</option>
+              <option>Decoration</option>
+              <option>Photography</option>
+              <option>Sound / DJ</option>
+              <option>Printing</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label>Phone *
+            <input type="text" name="phone" required pattern="[0-9]{10}" maxlength="10" title="Enter exactly 10 digits" placeholder="9876543210">
+            <span class="hint">Exactly 10 digits, numbers only.</span>
+          </label>
+          <label>Status *
+            <select name="status" required>
+              <option>Not Contacted</option>
+              <option>Contacted</option>
+              <option>Confirmed</option>
+            </select>
+          </label>
+        </div>
+        <button type="submit">Add Vendor</button>
+      </form>
+
+      <div class="card">
+        <h3>Vendor List</h3>
+        <div class="filterbox">
+          <input type="radio" name="vfilter" id="v-all" checked>
+          <label for="v-all">All</label>
+          <input type="radio" name="vfilter" id="v-confirmed">
+          <label for="v-confirmed">Confirmed</label>
+          <input type="radio" name="vfilter" id="v-contacted">
+          <label for="v-contacted">Contacted</label>
+          <input type="radio" name="vfilter" id="v-notcontacted">
+          <label for="v-notcontacted">Not Contacted</label>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Vendor</th><th>Category</th><th>Phone</th><th>Event</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                <tr class="confirmed"><td>Royal Caterers</td><td>Catering</td><td>9876543210</td><td>Tech Fest 2026</td><td><span class="badge green">Confirmed</span></td></tr>
+                <tr class="contacted"><td>Bloom Decor</td><td>Decoration</td><td>9123456780</td><td>Tech Fest 2026</td><td><span class="badge blue">Contacted</span></td></tr>
+                <tr class="notcontacted"><td>Click Studio</td><td>Photography</td><td>9988776655</td><td>AI Seminar</td><td><span class="badge grey">Not Contacted</span></td></tr>
+                <tr class="confirmed"><td>Sound Pro</td><td>Sound / DJ</td><td>9112233445</td><td>AI Seminar</td><td><span class="badge green">Confirmed</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <form class="card" method="get" action="#msg-ok">
+        <h3>Message a Vendor</h3>
+        <div class="form-grid">
+          <label>Vendor *
+            <select name="vendor" required>
+              <option value="">-- Select vendor --</option>
+              <option>Royal Caterers</option>
+              <option>Bloom Decor</option>
+              <option>Click Studio</option>
+              <option>Sound Pro</option>
+            </select>
+          </label>
+          <label>Message *
+            <textarea name="message" rows="3" required minlength="5" maxlength="200" placeholder="Type your message to the vendor..."></textarea>
+            <span class="hint">5 to 200 characters.</span>
+          </label>
+        </div>
+        <button type="submit">Send Message</button>
+
+        <h4>Message History</h4>
+        <ul class="messages">
+          <li><b>Royal Caterers</b> (20 Nov): Please confirm the final menu for 300 guests.</li>
+          <li><b>Bloom Decor</b> (18 Nov): Can you share photos of the stage decoration?</li>
+          <li><b>Sound Pro</b> (15 Nov): Booking confirmed for 18 December, 9 AM setup.</li>
+        </ul>
+      </form>
+    </section>
+
+
+    <!-- =====================================================
+         PAGE 7: BUDGET
+         ===================================================== -->
+    <section id="budget" class="page">
+      <div id="budget-ok" class="success-msg">✔ Expense saved successfully!</div>
+
+      <h2>Budget Tracking</h2>
+
+      <form class="card" method="get" action="#budget-ok">
+        <h3>Add Expense</h3>
+        <div class="form-grid">
+          <label>Event *
+            <select name="event" required>
+              <option value="">-- Select event --</option>
+              <option>Tech Fest 2026</option>
+              <option>Web Development Workshop</option>
+              <option>AI Seminar</option>
+              <option>Coding Contest</option>
+            </select>
+          </label>
+          <label>Item *
+            <input type="text" name="item" required minlength="2" maxlength="40" placeholder="e.g. Banners">
+            <span class="hint">At least 2 letters.</span>
+          </label>
+          <label>Category *
+            <select name="category" required>
+              <option>Catering</option>
+              <option>Decoration</option>
+              <option>Equipment</option>
+              <option>Prizes</option>
+              <option>Printing</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label>Estimated Cost (₹) *
+            <input type="number" name="estimated" required min="1" placeholder="5000">
+            <span class="hint">Must be 1 or more.</span>
+          </label>
+          <label>Actual Cost (₹) *
+            <input type="number" name="actual" required min="0" value="0">
+          </label>
+        </div>
+        <button type="submit">Add Expense</button>
+      </form>
+
+      <div class="card">
+        <h3>Budget Summary</h3>
+        <p class="summary-text">Planned: ₹1,13,000 | Spent: ₹73,500 | Remaining: ₹39,500</p>
+        <div class="progress"><div class="bar" style="width: 65%;"></div></div>
+        <p class="note">65% of the planned budget has been used.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Item</th><th>Event</th><th>Category</th><th>Estimated</th><th>Actual</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Food &amp; snacks</td><td>Tech Fest 2026</td><td>Catering</td><td>₹60,000</td><td>₹55,000</td><td><span class="badge green">Within budget</span></td></tr>
+              <tr><td>Stage decoration</td><td>Tech Fest 2026</td><td>Decoration</td><td>₹25,000</td><td>₹0</td><td><span class="badge grey">Not paid yet</span></td></tr>
+              <tr><td>Stage &amp; sound</td><td>AI Seminar</td><td>Equipment</td><td>₹15,000</td><td>₹16,000</td><td><span class="badge red">Over budget</span></td></tr>
+              <tr><td>Winner prizes</td><td>Coding Contest</td><td>Prizes</td><td>₹10,000</td><td>₹0</td><td><span class="badge grey">Not paid yet</span></td></tr>
+              <tr><td>Posters</td><td>Web Development Workshop</td><td>Printing</td><td>₹3,000</td><td>₹2,500</td><td><span class="badge green">Within budget</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =====================================================
+         PAGE 8: TIMELINE
+         ===================================================== -->
+    <section id="timeline" class="page">
+      <div id="task-ok" class="success-msg">✔ Task saved successfully!</div>
+
+      <h2>Timeline / Tasks</h2>
+
+      <form class="card" method="get" action="#task-ok">
+        <h3>Add Task</h3>
+        <div class="form-grid">
+          <label>Event *
+            <select name="event" required>
+              <option value="">-- Select event --</option>
+              <option>Tech Fest 2026</option>
+              <option>Web Development Workshop</option>
+              <option>AI Seminar</option>
+              <option>Coding Contest</option>
+            </select>
+          </label>
+          <label>Task *
+            <input type="text" name="task" required minlength="3" maxlength="60" placeholder="e.g. Book the projector">
+            <span class="hint">At least 3 letters.</span>
+          </label>
+          <label>Due Date *
+            <input type="date" name="due" required>
+          </label>
+        </div>
+        <button type="submit">Add Task</button>
+      </form>
+
+      <div class="card">
+        <h3>Task List (3 of 6 done)</h3>
+        <div class="progress"><div class="bar" style="width: 50%;"></div></div>
+        <p class="note">Tick the box when a task is finished.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Task</th><th>Event</th><th>Due Date</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><label class="task"><input type="checkbox" checked><span>Book the main auditorium</span></label></td><td>Tech Fest 2026</td><td>10 Nov 2026</td></tr>
+              <tr><td><label class="task"><input type="checkbox" checked><span>Invite the chief guest</span></label></td><td>Tech Fest 2026</td><td>15 Nov 2026</td></tr>
+              <tr><td><label class="task"><input type="checkbox"><span>Finalise the catering menu</span></label></td><td>Tech Fest 2026</td><td>28 Nov 2026</td></tr>
+              <tr><td><label class="task"><input type="checkbox"><span>Print the posters</span></label></td><td>Coding Contest</td><td>01 Dec 2026</td></tr>
+              <tr><td><label class="task"><input type="checkbox" checked><span>Prepare the lab computers</span></label></td><td>Web Development Workshop</td><td>10 Dec 2026</td></tr>
+              <tr><td><label class="task"><input type="checkbox"><span>Test the sound system</span></label></td><td>AI Seminar</td><td>15 Dec 2026</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =====================================================
+         PAGE 9: SEATING
+         ===================================================== -->
+    <section id="seating" class="page">
+      <div id="seat-ok" class="success-msg">✔ Seat assigned successfully!</div>
+
+      <h2>Seating Arrangement</h2>
+
+      <form class="card" method="get" action="#seat-ok">
+        <h3>Assign a Table</h3>
+        <p class="note">Each table holds a maximum of 8 people. (Tech Fest 2026 hall)</p>
+        <div class="form-grid">
+          <label>Person *
+            <select name="person" required>
+              <option value="">-- Select person --</option>
+              <option>Dr. Meena Rao (Chief Guest)</option>
+              <option>Mr. Arun Verma (Speaker)</option>
+              <option>Ravi Kumar</option>
+              <option>Anita Sharma</option>
+              <option>Sneha Reddy</option>
+              <option>Karan Mehta</option>
+            </select>
+          </label>
+          <label>Table Number (1-20) *
+            <input type="number" name="table" required min="1" max="20">
+            <span class="hint">Choose a number from 1 to 20.</span>
+          </label>
+        </div>
+        <button type="submit">Assign Seat</button>
+      </form>
+
+      <div class="card">
+        <h3>Tech Fest 2026 - Tables</h3>
+        <div class="tables-grid">
+          <div class="table-card">
+            <h4>Table 1 (VIP)</h4>
+            <small>2 / 8 seats</small>
+            <ul><li>Dr. Meena Rao</li><li>Mr. Arun Verma</li></ul>
+          </div>
+          <div class="table-card">
+            <h4>Table 2</h4>
+            <small>3 / 8 seats</small>
+            <ul><li>Ravi Kumar</li><li>Anita Sharma</li><li>Sneha Reddy</li></ul>
+          </div>
+          <div class="table-card">
+            <h4>Table 3</h4>
+            <small>0 / 8 seats</small>
+            <ul><li>Empty</li></ul>
+          </div>
+        </div>
+
+        <h4>People without a table</h4>
+        <ul>
+          <li>Karan Mehta</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>Campus Event Hub - Internet Programming Project</footer>
+
+</body>
+</html>
