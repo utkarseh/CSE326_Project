@@ -6,20 +6,26 @@
   <title>Campus Event Hub</title>
 
   <style>
-    /* ===================================================
-       CAMPUS EVENT HUB - neon blue + beige theme
+       /* ===================================================
+       CAMPUS EVENT HUB - professional navy + blue + beige
        =================================================== */
 
-    /* ----- colours (change them here) ----- */
+    /* ----- colours (change them all here) ----- */
     :root {
-      --navy: #0b1b3a;
-      --neon: #00cfff;
-      --beige: #f6edda;
-      --beige-dark: #e6d8b8;
-      --card: #fffaf0;
-      --green: #14915f;
-      --orange: #e07b00;
-      --red: #d6455d;
+      --navy: #1b2a41;        /* header, table headings */
+      --blue: #2f6db5;        /* buttons, highlights */
+      --blue-dark: #1f4e8c;   /* button hover */
+      --blue-light: #e8f0fa;  /* light blue background */
+      --beige: #f5f1e8;       /* page background */
+      --beige-dark: #ddd5c3;  /* borders */
+      --card: #fffdf8;        /* card background */
+      --text: #1f2937;        /* main text */
+      --muted: #5b6573;       /* small grey text */
+      --green: #2e7d5b;
+      --orange: #c77700;
+      --red: #b83a4b;
+      --grey: #6b7280;
+      --shadow: 0 2px 8px rgba(27, 42, 65, 0.12);
     }
 
     * { box-sizing: border-box; }
@@ -29,7 +35,7 @@
       font-family: Arial, sans-serif;
       margin: 0;
       background: var(--beige);
-      color: var(--navy);
+      color: var(--text);
     }
 
     /* ----- header + menu (stays on top while scrolling) ----- */
@@ -39,21 +45,20 @@
       position: sticky;
       top: 0;
       z-index: 5;
-      border-bottom: 3px solid var(--neon);
-      box-shadow: 0 0 15px rgba(0, 207, 255, 0.6);
+      border-bottom: 4px solid var(--blue);
+      box-shadow: var(--shadow);
     }
 
     header h1 {
       margin: 0 0 8px 0;
       font-size: 24px;
-      color: var(--neon);
-      text-shadow: 0 0 8px var(--neon);
+      color: white;
     }
 
     nav { display: flex; flex-wrap: wrap; align-items: center; }
 
     .nav-title {
-      color: var(--neon);
+      color: #9fb6d6;
       font-size: 12px;
       font-weight: bold;
       margin: 0 4px 0 10px;
@@ -65,15 +70,15 @@
       text-decoration: none;
       padding: 7px 13px;
       margin: 3px;
-      border-radius: 20px;
-      border: 1px solid var(--neon);
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
       font-size: 14px;
       transition: 0.3s;
     }
 
-    nav a:hover { background: var(--neon); color: var(--navy); box-shadow: 0 0 12px var(--neon); }
+    nav a:hover { background: var(--blue); border-color: var(--blue); }
 
-    /* the menu button of the page you are on is lit up */
+    /* the menu button of the page you are on is highlighted */
     body:not(:has(:target)) nav a[href="#events"],
     body:has(#events:target, #events :target) nav a[href="#events"],
     body:has(#register:target) nav a[href="#register"],
@@ -84,14 +89,16 @@
     body:has(#budget:target, #budget :target) nav a[href="#budget"],
     body:has(#timeline:target, #timeline :target) nav a[href="#timeline"],
     body:has(#seating:target, #seating :target) nav a[href="#seating"] {
-      background: var(--neon);
+      background: white;
       color: var(--navy);
-      box-shadow: 0 0 12px var(--neon);
+      border-color: white;
+      font-weight: bold;
     }
 
     main { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
-    footer { text-align: center; padding: 15px; color: #6b6249; font-size: 13px; }
-    .note { font-size: 13px; color: #5c5640; }
+    footer { text-align: center; padding: 15px; color: var(--muted); font-size: 13px; }
+    .note { font-size: 13px; color: var(--muted); }
+    h2 { color: var(--navy); }
 
     /* ----- PAGES: only one page is visible at a time ----- */
     .page { display: none; scroll-margin-top: 140px; }
@@ -103,41 +110,40 @@
     .card {
       background: var(--card);
       padding: 15px;
-      border-radius: 12px;
+      border-radius: 10px;
       margin-bottom: 20px;
-      border: 2px solid var(--beige-dark);
+      border: 1px solid var(--beige-dark);
+      box-shadow: var(--shadow);
       transition: 0.3s;
     }
     .card:hover {
-      transform: translateY(-4px);
-      border-color: var(--neon);
-      box-shadow: 0 0 14px rgba(0, 207, 255, 0.55);
+      transform: translateY(-3px);
+      border-color: var(--blue);
     }
 
     /* ----- buttons ----- */
     .btn, button {
       display: inline-block;
-      background: var(--neon);
-      color: var(--navy);
+      background: var(--blue);
+      color: white;
       font-weight: bold;
       border: none;
       padding: 10px 20px;
-      border-radius: 20px;
+      border-radius: 6px;
       font-size: 14px;
       text-decoration: none;
       cursor: pointer;
-      box-shadow: 0 0 8px rgba(0, 207, 255, 0.7);
       transition: 0.3s;
     }
-    .btn:hover, button:hover { background: var(--navy); color: var(--neon); transform: scale(1.05); }
-    .btn.disabled { background: #aaa; color: #555; box-shadow: none; cursor: not-allowed; }
-    .btn.disabled:hover { background: #aaa; color: #555; transform: none; }
+    .btn:hover, button:hover { background: var(--blue-dark); transform: translateY(-2px); }
+    .btn.disabled { background: #b5b5b5; color: #fff; cursor: not-allowed; }
+    .btn.disabled:hover { background: #b5b5b5; transform: none; }
 
     /* ----- how it works strip ----- */
     .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 15px; }
-    .step { background: var(--navy); color: white; padding: 12px; border-radius: 10px; font-size: 14px; }
+    .step { background: var(--navy); color: white; padding: 12px; border-radius: 8px; font-size: 14px; }
     .step b {
-      display: inline-block; background: var(--neon); color: var(--navy);
+      display: inline-block; background: var(--blue); color: white;
       width: 26px; height: 26px; line-height: 26px; text-align: center;
       border-radius: 50%; margin-right: 6px;
     }
@@ -147,23 +153,23 @@
 
     .filterbox > label {
       display: inline-block;
-      background: var(--card);
+      background: white;
       color: var(--navy);
-      border: 2px solid var(--neon);
+      border: 1px solid var(--blue);
       padding: 7px 16px;
       margin: 0 6px 12px 0;
-      border-radius: 20px;
+      border-radius: 6px;
       font-size: 14px;
       font-weight: normal;
       cursor: pointer;
       transition: 0.3s;
     }
-    .filterbox > label:hover { box-shadow: 0 0 10px var(--neon); }
+    .filterbox > label:hover { background: var(--blue-light); }
 
     /* chosen button is highlighted */
     .filterbox > input:checked + label {
-      background: var(--neon);
-      box-shadow: 0 0 10px var(--neon);
+      background: var(--blue);
+      color: white;
       font-weight: bold;
     }
 
@@ -186,31 +192,30 @@
     /* ----- event cards ----- */
     .events { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
     .events .card { margin-bottom: 0; }
-    .events h3 { margin: 0 0 6px 0; }
+    .events h3 { margin: 0 0 6px 0; color: var(--navy); }
     .events p { margin: 5px 0; font-size: 14px; }
 
     /* click to open boxes */
     details { margin: 8px 0; }
-    summary { cursor: pointer; color: #006c94; font-weight: bold; font-size: 14px; }
+    summary { cursor: pointer; color: var(--blue-dark); font-weight: bold; font-size: 14px; }
     summary:hover { text-decoration: underline; }
-    details p { background: #e6fbff; padding: 6px 8px; border-radius: 6px; font-size: 14px; }
+    details p { background: var(--blue-light); padding: 6px 8px; border-radius: 6px; font-size: 14px; }
     details.card summary { font-size: 16px; }
 
     /* ----- seat / progress bars (they grow when the page opens) ----- */
-    .progress { background: var(--beige-dark); border-radius: 10px; height: 14px; overflow: hidden; margin: 6px 0; }
-    .bar { background: linear-gradient(90deg, #00a8e0, var(--neon)); height: 100%; animation: grow 1.2s ease; }
+    .progress { background: var(--beige-dark); border-radius: 10px; height: 12px; overflow: hidden; margin: 6px 0; }
+    .bar { background: var(--blue); height: 100%; animation: grow 1.2s ease; }
     .bar.warn { background: var(--orange); }
     .bar.full { background: var(--red); }
     @keyframes grow { from { width: 0; } }
 
     /* ----- badges ----- */
-    .badge { padding: 3px 9px; border-radius: 10px; font-size: 12px; color: white; white-space: nowrap; }
+    .badge { padding: 3px 9px; border-radius: 4px; font-size: 12px; color: white; white-space: nowrap; }
     .badge.green  { background: var(--green); }
     .badge.red    { background: var(--red); }
-    .badge.grey   { background: #777; }
-    .badge.orange { background: var(--orange); animation: pulse 1.5s infinite; }
-    .badge.blue   { background: var(--neon); color: var(--navy); font-weight: bold; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+    .badge.grey   { background: var(--grey); }
+    .badge.orange { background: var(--orange); }
+    .badge.blue   { background: var(--blue); }
 
     /* ----- forms ----- */
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 12px; }
@@ -220,29 +225,29 @@
     input, select, textarea {
       padding: 9px;
       margin-top: 4px;
-      border: 2px solid var(--beige-dark);
-      border-radius: 8px;
+      border: 1px solid #bdb6a3;
+      border-radius: 6px;
       background: white;
-      color: var(--navy);
+      color: var(--text);
       font-size: 14px;
       font-weight: normal;
       font-family: Arial, sans-serif;
       transition: 0.3s;
     }
 
-    /* glowing border when you click in a box */
+    /* blue outline when you click in a box */
     input:focus, select:focus, textarea:focus {
       outline: none;
-      border-color: var(--neon);
-      box-shadow: 0 0 8px var(--neon);
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(47, 109, 181, 0.25);
     }
 
     /* red = wrong, green = correct */
-    input:user-invalid, select:user-invalid, textarea:user-invalid { border-color: var(--red); background: #fff1f3; }
+    input:user-invalid, select:user-invalid, textarea:user-invalid { border-color: var(--red); background: #fdf1f2; }
     input:user-valid, textarea:user-valid { border-color: var(--green); }
 
     /* small help text, visible only while typing in that box */
-    .hint { display: none; font-size: 12px; font-weight: normal; color: #006c94; margin-top: 3px; }
+    .hint { display: none; font-size: 12px; font-weight: normal; color: var(--blue-dark); margin-top: 3px; }
     input:focus ~ .hint, textarea:focus ~ .hint { display: block; }
 
     .agree { flex-direction: row; align-items: center; font-weight: normal; margin-bottom: 12px; }
@@ -253,24 +258,24 @@
     .choice input { position: absolute; opacity: 0; }
     .choice label {
       display: block; font-weight: normal; background: white;
-      border: 2px solid var(--beige-dark); border-radius: 10px;
+      border: 1px solid var(--beige-dark); border-radius: 8px;
       padding: 10px 12px; margin-bottom: 8px; cursor: pointer; transition: 0.3s;
     }
-    .choice label:hover { border-color: var(--neon); box-shadow: 0 0 8px var(--neon); }
-    .choice input:checked + label { border-color: var(--neon); background: #e6fbff; box-shadow: 0 0 12px var(--neon); }
-    .choice input:checked + label::after { content: "  ✔ Selected"; color: #006c94; font-weight: bold; }
-    .choice input:disabled + label { opacity: 0.5; cursor: not-allowed; box-shadow: none; border-color: var(--beige-dark); }
-    .choice label span { display: block; font-size: 13px; color: #5c5640; margin-top: 3px; }
+    .choice label:hover { border-color: var(--blue); background: var(--blue-light); }
+    .choice input:checked + label { border: 2px solid var(--blue); background: var(--blue-light); }
+    .choice input:checked + label::after { content: "  ✔ Selected"; color: var(--blue-dark); font-weight: bold; }
+    .choice input:disabled + label { opacity: 0.5; cursor: not-allowed; background: #eee; border-color: var(--beige-dark); }
+    .choice label span { display: block; font-size: 13px; color: var(--muted); margin-top: 3px; }
 
     /* ----- success message (shown after a form is sent) ----- */
     .success-msg {
       display: none;
-      background: var(--navy);
-      color: var(--neon);
-      border: 2px solid var(--neon);
-      box-shadow: 0 0 12px var(--neon);
+      background: #e7f4ed;
+      color: #1e5a3f;
+      border: 1px solid var(--green);
+      border-left: 6px solid var(--green);
       padding: 12px 18px;
-      border-radius: 10px;
+      border-radius: 6px;
       margin-bottom: 15px;
       font-weight: bold;
       scroll-margin-top: 140px;
@@ -280,22 +285,23 @@
     /* ----- dashboard ----- */
     .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
     .stat {
-      background: var(--card); padding: 15px; text-align: center; border-radius: 12px;
-      border: 2px solid var(--beige-dark); border-top: 4px solid var(--neon); transition: 0.3s;
+      background: var(--card); padding: 15px; text-align: center; border-radius: 10px;
+      border: 1px solid var(--beige-dark); border-top: 4px solid var(--blue);
+      box-shadow: var(--shadow); transition: 0.3s;
     }
-    .stat:hover { transform: translateY(-4px); box-shadow: 0 0 14px rgba(0, 207, 255, 0.55); }
-    .stat .number { font-size: 24px; font-weight: bold; color: #006c94; }
-    .summary-text { font-weight: bold; color: #006c94; }
+    .stat:hover { transform: translateY(-3px); }
+    .stat .number { font-size: 24px; font-weight: bold; color: var(--navy); }
+    .summary-text { font-weight: bold; color: var(--blue-dark); }
 
     /* ----- tables ----- */
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: 9px; border-bottom: 1px solid var(--beige-dark); text-align: left; font-size: 14px; }
-    th { background: var(--navy); color: var(--neon); }
-    tbody tr:hover { background: #e6fbff; }
+    th { background: var(--navy); color: white; }
+    tbody tr:hover { background: var(--blue-light); }
 
     .notif-list { list-style: none; padding: 0; margin: 0; }
-    .notif-list li { padding: 10px; margin-bottom: 8px; background: white; border-left: 5px solid var(--neon); border-radius: 6px; font-size: 14px; }
+    .notif-list li { padding: 10px; margin-bottom: 8px; background: white; border-left: 4px solid var(--blue); border-radius: 4px; font-size: 14px; }
 
     /* ----- timeline tick boxes ----- */
     label.task { flex-direction: row; align-items: center; font-weight: normal; }
@@ -304,9 +310,9 @@
 
     /* ----- seating ----- */
     .tables-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 15px; }
-    .table-card { border: 2px solid var(--neon); border-radius: 10px; padding: 10px; background: white; transition: 0.3s; }
-    .table-card:hover { box-shadow: 0 0 12px var(--neon); }
-    .table-card h4 { margin: 0 0 4px 0; }
+    .table-card { border: 1px solid var(--blue); border-radius: 8px; padding: 10px; background: white; transition: 0.3s; }
+    .table-card:hover { background: var(--blue-light); }
+    .table-card h4 { margin: 0 0 4px 0; color: var(--navy); }
     .table-card ul { padding-left: 18px; margin: 8px 0 0 0; font-size: 14px; }
 
     .messages { padding-left: 18px; font-size: 14px; }
@@ -315,7 +321,7 @@
     /* ----- confirmation slip ----- */
     .slip {
       max-width: 500px; margin: 0 auto 20px auto; background: white; padding: 20px;
-      border: 3px dashed var(--neon); border-radius: 12px; box-shadow: 0 0 14px rgba(0, 207, 255, 0.5);
+      border: 2px dashed var(--blue); border-radius: 10px; box-shadow: var(--shadow);
     }
     .slip h2 { text-align: center; margin-top: 0; }
     .slip td:first-child { font-weight: bold; width: 40%; }
